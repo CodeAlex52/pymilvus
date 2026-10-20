@@ -5,8 +5,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-      - run: pip install -e ".[bulk_writer]" pytest
-      - run: pytest tests/unit/test_bulk_writer_buffer.py -q
+          ref: fix/powershell-hashtable-blocklist
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: npm run build
+      - name: new regression test
+        run: node test/test-powershell-hashtable-values.js
+      - name: existing blocklist bypass tests
+        run: node test/test-blocklist-bypass.js
+      - name: existing blocked commands tests
+        run: node test/test-blocked-commands.js
